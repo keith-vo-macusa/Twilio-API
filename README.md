@@ -1,11 +1,134 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Twilio API Mock Server
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Hệ thống giả lập API của Twilio để test hệ thống. Hỗ trợ gửi SMS đến số điện thoại Mỹ với request/response format giống hệt Twilio.
+
+## Tính năng
+
+- ✅ Giả lập Twilio Messages API (POST, GET, DELETE)
+- ✅ Authentication với API Key hoặc Account SID/Auth Token
+- ✅ Response format giống hệt Twilio
+- ✅ Hỗ trợ số điện thoại Mỹ (format: +1XXXXXXXXXX)
+- ✅ Pagination và filtering
+- ✅ Tính toán số segments tự động
+
+## Cài đặt
+
+1. Cài đặt dependencies:
+```bash
+composer install
+npm install
+```
+
+2. Tạo file `.env` từ `.env.example`:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+3. Cấu hình Twilio credentials trong `.env`:
+```env
+TWILIO_ACCOUNT_SID=ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_API_KEY=your_api_key
+TWILIO_API_SECRET=your_api_secret
+```
+
+4. Chạy migration:
+```bash
+php artisan migrate
+```
+
+5. Khởi động server:
+```bash
+php artisan serve
+```
+
+## Sử dụng
+
+### Base URL
+```
+http://localhost:8000/api
+```
+
+### Authentication
+
+Sử dụng HTTP Basic Authentication với:
+- **Username**: API Key hoặc Account SID
+- **Password**: API Secret hoặc Auth Token
+
+### Gửi SMS
+
+**POST** `/api/2010-04-01/Accounts/{AccountSid}/Messages.json`
+
+```bash
+curl -X POST http://localhost:8000/api/2010-04-01/Accounts/ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/Messages.json \
+  -u YOUR_API_KEY:YOUR_API_SECRET \
+  -d "To=+12025551234" \
+  -d "From=+12025555678" \
+  -d "Body=Hello from Twilio Mock!"
+```
+
+**Response:**
+```json
+{
+  "account_sid": "ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "api_version": "2010-04-01",
+  "body": "Hello from Twilio Mock!",
+  "date_created": "Mon, 18 Nov 2024 12:00:00 +0000",
+  "date_sent": "Mon, 18 Nov 2024 12:00:00 +0000",
+  "date_updated": "Mon, 18 Nov 2024 12:00:00 +0000",
+  "direction": "outbound-api",
+  "error_code": null,
+  "error_message": null,
+  "from": "+12025555678",
+  "messaging_service_sid": null,
+  "num_media": "0",
+  "num_segments": "1",
+  "price": "-0.00750",
+  "price_unit": "USD",
+  "sid": "SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "status": "sent",
+  "subresource_uris": {
+    "media": "/2010-04-01/Accounts/ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/Messages/SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/Media.json",
+    "feedback": "/2010-04-01/Accounts/ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/Messages/SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/Feedback.json"
+  },
+  "to": "+12025551234",
+  "uri": "/2010-04-01/Accounts/ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/Messages/SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.json"
+}
+```
+
+### Lấy danh sách Messages
+
+**GET** `/api/2010-04-01/Accounts/{AccountSid}/Messages.json`
+
+```bash
+curl -X GET "http://localhost:8000/api/2010-04-01/Accounts/ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/Messages.json?PageSize=50&Page=0" \
+  -u YOUR_API_KEY:YOUR_API_SECRET
+```
+
+### Lấy thông tin Message cụ thể
+
+**GET** `/api/2010-04-01/Accounts/{AccountSid}/Messages/{MessageSid}.json`
+
+```bash
+curl -X GET http://localhost:8000/api/2010-04-01/Accounts/ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/Messages/SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.json \
+  -u YOUR_API_KEY:YOUR_API_SECRET
+```
+
+### Xóa Message
+
+**DELETE** `/api/2010-04-01/Accounts/{AccountSid}/Messages/{MessageSid}.json`
+
+```bash
+curl -X DELETE http://localhost:8000/api/2010-04-01/Accounts/ACaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/Messages/SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.json \
+  -u YOUR_API_KEY:YOUR_API_SECRET
+```
+
+## Lưu ý
+
+- Số điện thoại Mỹ phải có format: `+1XXXXXXXXXX` (11 ký tự, bắt đầu bằng +1)
+- Response format giống hệt Twilio API
+- Tất cả messages được lưu trong database để có thể query lại
 
 ## About Laravel
 
