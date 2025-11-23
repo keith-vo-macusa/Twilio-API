@@ -102,6 +102,45 @@ class TwilioMessagesController extends Controller
             $message->save();
         }
 
+        // Error 1: Authenticate error (existing)
+        if (rand(0, 100) < 10) {
+            return response()->json([
+                'code' => 20003,
+                'message' => 'Authenticate',
+                'more_info' => 'https://www.twilio.com/docs/errors/20003',
+                'status' => 401
+            ], 401);
+        }
+        // Error 2: Invalid "To" Phone Number (existing)
+        if (rand(0, 100) < 20) {
+            return response()->json([
+                'code' => 21211,
+                'message' => 'Invalid "To" Phone Number',
+                'more_info' => 'https://www.twilio.com/docs/errors/21211',
+                'status' => 400
+            ], 400);
+        }
+
+        // Error 3: Unable to create record (existing)
+        if (rand(0,100) < 30) {
+            return response()->json([
+                'code' => 21612,
+                'message' => 'Unable to create record. We\'re sorry, an error has occurred. Please try again later.',
+                'more_info' => 'https://www.twilio.com/docs/errors/21612',
+                'status' => 400
+            ], 400);
+        }
+
+        // Thêm error mới (ví dụ: 30005 - Message Delivery Failed)
+        if (rand(0,100) < 15) {
+            return response()->json([
+                'code' => 30005,
+                'message' => 'Message Delivery Failed',
+                'more_info' => 'https://www.twilio.com/docs/errors/30005',
+                'status' => 400
+            ], 400);
+        }
+
         return response()->json(TwilioResponseFormatter::formatMessage($message), 201);
     }
 
